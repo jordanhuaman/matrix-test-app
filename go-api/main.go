@@ -4,9 +4,13 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/joho/godotenv"
+	database "github.com/jordanhuaman/go-api/src/framework"
 )
 
 func main() {
+	godotenv.Load()
+	database.ConnectDb()
 	// Create new Fiber instance
 	app := fiber.New()
 	// Create new GET route on path "/"
