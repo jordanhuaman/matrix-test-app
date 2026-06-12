@@ -58,6 +58,8 @@ func SetupRoutes(app *fiber.App) {
 	matrixHandler := handlers.NewMatrixHandler(matrixService)
 
 	matrix := api.Group("/matrix", middleware.Protected())
+	matrix.Get("/qr", matrixHandler.ListResults)
+	matrix.Get("/qr/:id", matrixHandler.GetResult)
 	matrix.Post("/qr", matrixHandler.CreateQR)
 
 }
