@@ -62,6 +62,7 @@ docker compose down -v
 ```
 
 ## Despliegue en Kubernetes (Helm)
+### !Los archivos del despliege no estan compartidos
 
 ```bash
 # Instalar/actualizar
