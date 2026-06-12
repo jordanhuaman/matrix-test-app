@@ -1,7 +1,8 @@
-package framework
+package in
 
 import (
 	"github.com/gofiber/fiber/v3"
+	"github.com/jordanhuaman/go-api/src/framework/out"
 	"github.com/jordanhuaman/go-api/src/models"
 )
 
@@ -30,7 +31,7 @@ func CreateUser(c fiber.Ctx) error {
 		Password: dto.Password,
 	}
 
-	result := Database.Db.Create(&user)
+	result := out.Database.Db.Create(&user)
 	if result.Error != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "No se pudo crear el usuario: " + result.Error.Error(),

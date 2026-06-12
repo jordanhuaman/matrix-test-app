@@ -6,8 +6,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/joho/godotenv"
-	"github.com/jordanhuaman/go-api/src/framework"
-	database "github.com/jordanhuaman/go-api/src/framework"
+	framework "github.com/jordanhuaman/go-api/src/framework/in"
+	database "github.com/jordanhuaman/go-api/src/framework/out"
 )
 
 // 1. Creamos una estructura propia que envuelve al validador original
@@ -25,8 +25,17 @@ func welcome(c fiber.Ctx) error {
 }
 
 func setupRoutes(app *fiber.App) {
-	app.Get("/api", welcome)
-	app.Post("/user/register", framework.CreateUser)
+	api := app.Group("/api")
+	api.Get("/status", welcome)
+
+	auth := api.Group("/auth")
+
+	auth.Post("/register", framework.CreateUser)
+	auth.Post("/login", func() {})
+
+	user := api.Group("/user")
+	user.Get("/", func() {})
+
 }
 
 func main() {
