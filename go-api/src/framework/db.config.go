@@ -1,4 +1,4 @@
-package database
+package framework
 
 import (
 	"fmt"
