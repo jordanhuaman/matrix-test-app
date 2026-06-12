@@ -20,14 +20,14 @@ var (
 
 // AuthService provides authentication functionality
 type AuthService struct {
-	userRepo         *models.UserRepository
-	refreshTokenRepo *models.RefreshTokenRepository
+	userRepo         UserRepository
+	refreshTokenRepo RefreshTokenRepository
 	jwtSecret        []byte
 	accessTokenTTL   time.Duration
 }
 
 // NewAuthService creates a new authentication service
-func NewAuthService(userRepo *models.UserRepository, refreshTokenRepo *models.RefreshTokenRepository, jwtSecret string, accessTokenTTL time.Duration) *AuthService {
+func NewAuthService(userRepo UserRepository, refreshTokenRepo RefreshTokenRepository, jwtSecret string, accessTokenTTL time.Duration) *AuthService {
 	if jwtSecret == "" {
 		panic("jwt secret must not be empty")
 	}

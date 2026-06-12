@@ -7,22 +7,29 @@ import (
 	"math"
 
 	"github.com/google/uuid"
-	"github.com/jordanhuaman/go-api/src/clients"
 	"github.com/jordanhuaman/go-api/src/models"
 )
 
+type ValidationError struct {
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return e.Message
+}
+
 type MatrixService struct {
-	userRepo         *models.UserRepository
-	matrixInputRepo  *models.MatrixInputRepository
-	matrixResultRepo *models.MatrixResultRepository
-	nodeClient       *clients.NodeClient
+	userRepo         UserRepository
+	matrixInputRepo  MatrixInputRepository
+	matrixResultRepo MatrixResultRepository
+	nodeClient       NodeClient
 }
 
 func NewMatrixService(
-	userRepo *models.UserRepository,
-	matrixInputRepo *models.MatrixInputRepository,
-	matrixResultRepo *models.MatrixResultRepository,
-	nodeClient *clients.NodeClient,
+	userRepo UserRepository,
+	matrixInputRepo MatrixInputRepository,
+	matrixResultRepo MatrixResultRepository,
+	nodeClient NodeClient,
 ) *MatrixService {
 	return &MatrixService{
 		userRepo:         userRepo,
@@ -42,7 +49,7 @@ func (s *MatrixService) GetResultByID(ctx context.Context, userID, id uuid.UUID)
 
 func (s *MatrixService) ProcessMatrix(ctx context.Context, userID uuid.UUID, data [][]float64) (*models.MatrixResult, error) {
 	if len(data) == 0 || len(data[0]) == 0 {
-		return nil, errors.New("matrix cannot be empty")
+		return nil, &ValidationError{Message: "matrix cannot be empty"}
 	}
 
 	rows := len(data)
@@ -50,7 +57,7 @@ func (s *MatrixService) ProcessMatrix(ctx context.Context, userID uuid.UUID, dat
 
 	for i, row := range data {
 		if len(row) != cols {
-			return nil, fmt.Errorf("matrix is not rectangular: row %d has %d columns, expected %d", i, len(row), cols)
+			return nil, &ValidationError{Message: fmt.Sprintf("matrix is not rectangular: row %d has %d columns, expected %d", i, len(row), cols)}
 		}
 	}
 

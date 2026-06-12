@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"strconv"
 
 	jwtware "github.com/gofiber/contrib/v3/jwt"
@@ -123,6 +124,12 @@ func (h *MatrixHandler) CreateQR(c fiber.Ctx) error {
 
 	result, err := h.matrixService.ProcessMatrix(c.Context(), userID, input.Data)
 	if err != nil {
+		var validationErr *services.ValidationError
+		if errors.As(err, &validationErr) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status": "error", "message": err.Error(), "data": nil,
+			})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status": "error", "message": err.Error(), "data": nil,
 		})
