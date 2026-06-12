@@ -1,4 +1,4 @@
-package out
+package database
 
 import (
 	"fmt"
@@ -40,7 +40,7 @@ func ConnectDb() {
 	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("Running Migrations")
 
-	db.AutoMigrate(&models.User{}, &models.Statistics{}, &models.MatrixInput{}, &models.MatrixResult{})
+	db.AutoMigrate(&models.User{}, &models.Statistics{}, &models.MatrixInput{}, &models.MatrixResult{}, &models.RefreshToken{})
 
 	Database = DbInstance{
 		Db: db,

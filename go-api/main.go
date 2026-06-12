@@ -5,9 +5,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/joho/godotenv"
-	framework "github.com/jordanhuaman/go-api/src/framework/in"
-	database "github.com/jordanhuaman/go-api/src/framework/out"
+	"github.com/jordanhuaman/go-api/src/database"
+	"github.com/jordanhuaman/go-api/src/router"
 )
 
 // 1. Creamos una estructura propia que envuelve al validador original
@@ -19,25 +20,6 @@ type GoPlaygroundValidator struct {
 func (v *GoPlaygroundValidator) Validate(out any) error {
 	return v.Validator.Struct(out)
 }
-
-func welcome(c fiber.Ctx) error {
-	return c.SendString("Welcome to my API")
-}
-
-func setupRoutes(app *fiber.App) {
-	api := app.Group("/api")
-	api.Get("/status", welcome)
-
-	auth := api.Group("/auth")
-
-	auth.Post("/register", framework.CreateUser)
-	auth.Post("/login", func() {})
-
-	user := api.Group("/user")
-	user.Get("/", func() {})
-
-}
-
 func main() {
 	godotenv.Load()
 	database.ConnectDb()
@@ -45,6 +27,7 @@ func main() {
 	cv := &GoPlaygroundValidator{Validator: validator.New()}
 
 	app := fiber.New(fiber.Config{StructValidator: cv})
-	setupRoutes(app)
+	app.Use(cors.New(cors.Config{AllowOrigins: []string{"http://localhost:3000"}}))
+	router.SetupRoutes(app)
 	log.Fatal(app.Listen(":3000"))
 }
