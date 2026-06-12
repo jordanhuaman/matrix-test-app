@@ -1,0 +1,92 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${DB_PORT_HOST:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  nodejs-api:
+    build:
+      context: ./nodejs-api
+      dockerfile: Dockerfile
+    container_name: nodejs-api
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+    networks:
+      - app-net
+
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    container_name: go-api
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      DB_SSL_MODE: disable
+      DB_SCHEMA: ${DB_SCHEMA}
+      SECRET: ${JWT_SECRET}
+      NODE_SERVICE_URL: http://nodejs-api:3001
+      NODE_SERVICE_TIMEOUT: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: front
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+    depends_on:
+      - go-api
+    networks:
+      - app-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - front
+      - go-api
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -3,3 +3,5 @@
 .history/
 .air.toml
 node_modules/
+k8s/
+helm/
