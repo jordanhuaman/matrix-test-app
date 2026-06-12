@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/go-playground/validator/v10"
@@ -21,7 +22,11 @@ func (v *GoPlaygroundValidator) Validate(out any) error {
 	return v.Validator.Struct(out)
 }
 func main() {
-	godotenv.Load()
+	// godotenv.Load()
+
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Println("Warning: no .env file found, using environment variables")
+	}
 	database.ConnectDb()
 
 	cv := &GoPlaygroundValidator{Validator: validator.New()}

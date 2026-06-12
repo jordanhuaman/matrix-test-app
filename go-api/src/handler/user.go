@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 
+	jwtware "github.com/gofiber/contrib/v3/jwt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -62,14 +63,12 @@ func (uh *UserHandler) GetUser(c fiber.Ctx) error {
 		return err
 	}
 
-	log.Printf("[GetUser] c.Locals(\"user\") type=%T value=%v\n", c.Locals("user"), c.Locals("user"))
-
-	tok, ok := c.Locals("user").(*jwt.Token)
-	if !ok {
-		log.Printf("[GetUser] ERROR: tok cast failed, locals user = %v\n", c.Locals("user"))
+	tok := jwtware.FromContext(c)
+	if tok == nil {
+		log.Printf("[GetUser] ERROR: token not found in context\n")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Token cast failed",
+			"message": "Token not found",
 			"data":    nil,
 		})
 	}
@@ -118,8 +117,8 @@ func (uh *UserHandler) UpdateUser(c fiber.Ctx) error {
 		return err
 	}
 
-	tok, ok := c.Locals("user").(*jwt.Token)
-	if !ok || !validToken(tok, id) { // id ya es string, directo
+	tok := jwtware.FromContext(c)
+	if tok == nil || !validToken(tok, id) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Invalid token id",
@@ -150,8 +149,8 @@ func (uh *UserHandler) DeleteUser(c fiber.Ctx) error {
 		return err
 	}
 
-	tok, ok := c.Locals("user").(*jwt.Token)
-	if !ok || !validToken(tok, id) { // id ya es string, directo
+	tok := jwtware.FromContext(c)
+	if tok == nil || !validToken(tok, id) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Invalid token id",

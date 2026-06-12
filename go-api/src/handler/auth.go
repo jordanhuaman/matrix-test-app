@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	jwtware "github.com/gofiber/contrib/v3/jwt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jordanhuaman/go-api/src/services"
@@ -137,8 +138,8 @@ func (ah *AuthHandler) Login(c fiber.Ctx) error {
 }
 
 func (ah *AuthHandler) Logout(c fiber.Ctx) error {
-	tok, ok := c.Locals("user").(*jwt.Token)
-	if !ok {
+	tok := jwtware.FromContext(c)
+	if tok == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Invalid authentication token",
