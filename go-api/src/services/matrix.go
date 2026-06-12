@@ -32,6 +32,14 @@ func NewMatrixService(
 	}
 }
 
+func (s *MatrixService) GetUserResults(ctx context.Context, userID uuid.UUID, page, limit int) ([]models.MatrixResult, int64, error) {
+	return s.matrixResultRepo.FindByUserID(userID, page, limit)
+}
+
+func (s *MatrixService) GetResultByID(ctx context.Context, userID, id uuid.UUID) (*models.MatrixResult, error) {
+	return s.matrixResultRepo.FindByID(userID, id)
+}
+
 func (s *MatrixService) ProcessMatrix(ctx context.Context, userID uuid.UUID, data [][]float64) (*models.MatrixResult, error) {
 	if len(data) == 0 || len(data[0]) == 0 {
 		return nil, errors.New("matrix cannot be empty")
