@@ -2,4 +2,4 @@
 .env.prod
 .history/
 .air.toml
-
+node_modules/
