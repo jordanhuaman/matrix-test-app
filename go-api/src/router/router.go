@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/jordanhuaman/go-api/src/clients"
 	"github.com/jordanhuaman/go-api/src/database"
 	handlers "github.com/jordanhuaman/go-api/src/handler"
 	"github.com/jordanhuaman/go-api/src/middleware"
@@ -48,5 +49,15 @@ func SetupRoutes(app *fiber.App) {
 	user.Get("/:id", userHandler.GetUser)
 	user.Patch("/:id", userHandler.UpdateUser)
 	user.Delete("/:id", userHandler.DeleteUser)
+
+	// Matrix
+	matrixInputRepo := models.NewMatrixInputRepository(database.Database.Db)
+	matrixResultRepo := models.NewMatrixResultRepository(database.Database.Db)
+	nodeClient := clients.NewNodeClient()
+	matrixService := services.NewMatrixService(userRepo, matrixInputRepo, matrixResultRepo, nodeClient)
+	matrixHandler := handlers.NewMatrixHandler(matrixService)
+
+	matrix := api.Group("/matrix", middleware.Protected())
+	matrix.Post("/qr", matrixHandler.CreateQR)
 
 }
