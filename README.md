@@ -52,10 +52,14 @@ Aplicación web para descomposición QR de matrices utilizando el proceso de **G
 cp .env.example .env
 
 # 2. Iniciar todos los servicios
-docker compose up -d
+docker compose up -d 
+  #! If you are on linux or if you have troubles runing in port :80
+    NGINX_PORT=8080 docker compose up -d 
 
 # 3. Acceder
 curl http://localhost/
+  #! only if you change the default port 
+  curl http://localhost/8080 # for linux
 
 # 4. Detener
 docker compose down -v
