@@ -10,6 +10,11 @@ app.use(matrixRoutes)
 app.use(notFoundHandler)
 app.use(errorHandler)
 
-app.listen(PORT, () => {
-  console.log(`[Node.js API] Running on http://localhost:${PORT}/`)
-})
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`[Node.js API] Running on http://localhost:${PORT}/`)
+  })
+}
+
+export { app }
+export default app
