@@ -4,7 +4,7 @@ Aplicación web para descomposición QR de matrices utilizando el proceso de **G
 
 ## Demo
 
-**URL:** https://test-interseguro.duckdns.org/home
+**URL:** https://test-interseguro.duckdns.org/home || http://44.203.109.80/matrix
 
 ## Arquitectura
 
